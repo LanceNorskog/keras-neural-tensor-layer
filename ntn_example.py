@@ -43,8 +43,8 @@ def main():
 
   model.fit([X_train, X_train], Y_train, nb_epoch=50, batch_size=5)
   score = model.evaluate([X_test, X_test], Y_test, batch_size=1)
-  print score
+  print(score)
 
-  print K.get_value(model.layers[2].W)
+  print(K.get_value(model.layers[2].W))
 
 main()
