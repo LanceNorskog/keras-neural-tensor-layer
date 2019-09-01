@@ -40,7 +40,7 @@ class NeuralTensorLayer(Layer):
     feed_forward_product = K.dot(K.concatenate([e1,e2]), self.V)
     print('ff: ', feed_forward_product)
     bilinear_tensor_products = [ K.sum((e2 * K.dot(e1, self.W[0])) + self.b, axis=1) ]
-    print('btp.shape: ', K.int_shape(bilinear_tensor_products))
+    print('btp.shape: ', K.int_shape(bilinear_tensor_products[0]))
     for i in range(k)[1:]:
       btp = K.sum((e2 * K.dot(e1, self.W[i])) + self.b, axis=1)
       bilinear_tensor_products.append(btp)
