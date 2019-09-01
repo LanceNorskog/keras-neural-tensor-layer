@@ -36,16 +36,16 @@ class NeuralTensorLayer(Layer):
     e2 = inputs[1]
     batch_size = K.shape(e1)[0]
     k = self.output_dim
-    # print([e1,e2])
+    print([e1,e2])
     feed_forward_product = K.dot(K.concatenate([e1,e2]), self.V)
-    # print(feed_forward_product)
+    print(feed_forward_product)
     bilinear_tensor_products = [ K.sum((e2 * K.dot(e1, self.W[0])) + self.b, axis=1) ]
     # print(bilinear_tensor_products)
     for i in range(k)[1:]:
       btp = K.sum((e2 * K.dot(e1, self.W[i])) + self.b, axis=1)
       bilinear_tensor_products.append(btp)
     result = K.tanh(K.reshape(K.concatenate(bilinear_tensor_products, axis=0), (batch_size, k)) + feed_forward_product)
-    # print(result)
+    print(result)
     return result
 
 
