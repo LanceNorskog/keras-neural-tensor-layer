@@ -5,9 +5,10 @@ from keras.engine.topology import Layer
 import scipy.stats as stats
 
 class NeuralTensorDiagLayer(Layer):
-  def __init__(self, output_dim, input_dim=None, **kwargs):
+  def __init__(self, output_dim, input_dim=None, activation='tanh', **kwargs):
     self.output_dim = output_dim #k
     self.input_dim = input_dim   #d
+    self.activation = activation
     if self.input_dim:
       kwargs['input_shape'] = (self.input_dim,)
     super(NeuralTensorDiagLayer, self).__init__(**kwargs)
@@ -49,7 +50,11 @@ class NeuralTensorDiagLayer(Layer):
     #print('o1: ', K.stack(diag_tensor_products))
     #print('o2: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (batch_size, k)))
     #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
-    result = K.tanh(K.stack(diag_tensor_products) + feed_forward_product + self.b)
+    stacked = K.stack(diag_tensor_products) + feed_forward_product + self.b
+    if self.activation == 'relu':
+      result = K.relu(stacked)
+    else:
+      result = K.tanh(stacked)
     #print('result: ', result)
     return result
 
