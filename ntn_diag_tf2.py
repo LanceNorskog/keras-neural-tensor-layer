@@ -1,4 +1,5 @@
 
+import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.python.keras.engine.base_layer import Layer
 import scipy.stats as stats
