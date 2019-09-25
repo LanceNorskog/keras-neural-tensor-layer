@@ -5,10 +5,11 @@ from keras.engine.topology import Layer
 import scipy.stats as stats
 
 class NeuralTensorDiagLayer(Layer):
-  def __init__(self, output_dim, input_dim=None, activation='tanh', **kwargs):
+  def __init__(self, output_dim, input_dim=None, activation=K.tanh, collector=K.mean, **kwargs):
     self.output_dim = output_dim #k
     self.input_dim = input_dim   #d
     self.activation = activation
+    self.collector=collector
     if self.input_dim:
       kwargs['input_shape'] = (self.input_dim,)
     super(NeuralTensorDiagLayer, self).__init__(**kwargs)
@@ -45,17 +46,14 @@ class NeuralTensorDiagLayer(Layer):
     #print('d3: ', e2 * (e1 * self.W[0]) + self.b)
     diag_tensor_products = [] 
     for i in range(k):
-      diag_tensor_products.append(K.mean(e2 * (e1 * self.W[i])))
+      diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
     #print('diag.shape: ', K.shape(diag_tensor_products[0]))
     #print('o1: ', K.stack(diag_tensor_products))
     #print('o2: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (batch_size, k)))
     #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
     stacked = K.stack(diag_tensor_products) + feed_forward_product + self.b
-    if self.activation == 'relu':
-      result = K.relu(stacked)
-    else:
-      result = K.tanh(stacked)
-    #print('result: ', result)
+    result = self.activation(stacked)
+    print('result: ', result)
     return result
 
 
