@@ -5,13 +5,10 @@ from keras.engine.topology import Layer
 import scipy.stats as stats
 
 class NeuralTensorDiagLayer(Layer):
-  def __init__(self, output_dim, input_dim=None, activation=K.tanh, collector=K.mean, **kwargs):
+  def __init__(self, output_dim, activation=K.tanh, collector=K.mean, **kwargs):
     self.output_dim = output_dim #k
-    self.input_dim = input_dim   #d
     self.activation = activation
     self.collector=collector
-    if self.input_dim:
-      kwargs['input_shape'] = (self.input_dim,)
     super(NeuralTensorDiagLayer, self).__init__(**kwargs)
 
 
@@ -20,7 +17,7 @@ class NeuralTensorDiagLayer(Layer):
     std = 1.0
     # W : k*d
     k = self.output_dim
-    d = self.input_dim
+    d = input_shape[0][-1]
     initial_W_values = stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(k,d))
     initial_V_values = stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(2*d,k))
     self.W = K.variable(initial_W_values, name='W')
