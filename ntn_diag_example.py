@@ -4,10 +4,6 @@ from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import hiddenlayer as hl
-import hiddenlayer.transforms as ht
-
-from google.colab import files
 
 from tensorflow.keras import backend as K
 
@@ -78,9 +74,6 @@ if True:
   adam = Adam()
   model.compile(loss='binary_crossentropy', optimizer=adam, metrics=['binary_accuracy'])
   model.summary()
-
-#!ls -l /tmp/file*.pdf
-#files.download('/tmp/filediag.pdf')
 
 history = model.fit([X1_train, X2_train], Y_train, 
             validation_split=0.2,
