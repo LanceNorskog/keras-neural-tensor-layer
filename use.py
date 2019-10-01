@@ -29,6 +29,7 @@ class USE(Layer):
         self.use_url = use_url
         super(USE, self).__init__(**kwargs)
 
+
     def build(self, input_shape):
         # Mysterious tf-hub stuff
         self.embed = hub.Module(self.use_url)
