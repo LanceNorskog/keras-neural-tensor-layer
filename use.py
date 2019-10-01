@@ -26,19 +26,17 @@ class USE(Layer):
     def __init__(self, 
                 use_url="https://tfhub.dev/google/universal-sentence-encoder-large/3",
                  **kwargs):
-        super(USE, self).__init__(**kwargs)
         self.use_url = use_url
+        super(USE, self).__init__(**kwargs)
 
     def build(self, input_shape):
+        assert len(input_shape) == 2
+        assert input_shape[-1] == 1
         # Mysterious tf-hub stuff
         self.embed = hub.Module(self.use_url)
         embed_size = self.embed.get_output_info_dict()['default'].get_shape()[1].value
         print('USE embed size: {}'.format(embed_size))
-        assert len(input_shape) == 2
-        assert input_shape[-1] == 1
-        # ??
-        self.input_spec = InputSpec(min_ndim=2, axes={-1: input_dim})
-        self.built = True
+        super(USE, self).build(input_shape)
 
     def UniversalEmbedding(x):
         return embed(tf.squeeze(tf.cast(x, tf.string)), signature="default", as_dict=True)["default"]
