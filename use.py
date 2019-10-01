@@ -41,7 +41,7 @@ class USE(Layer):
         return embed(tf.squeeze(tf.cast(x, tf.string)), signature="default", as_dict=True)["default"]
 
     def call(self, inputs):
-        assert len(inputs) == 1
+        assert len(inputs.shape) == 1
         return UniversalEmbedding(inputs[0])
 
     def compute_output_shape(self, input_shape):
