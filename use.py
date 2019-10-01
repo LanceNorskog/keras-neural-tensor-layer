@@ -30,8 +30,6 @@ class USE(Layer):
         super(USE, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        assert len(input_shape) == 2
-        assert input_shape[-1] == 1
         # Mysterious tf-hub stuff
         self.embed = hub.Module(self.use_url)
         embed_size = self.embed.get_output_info_dict()['default'].get_shape()[1].value
