@@ -1,4 +1,4 @@
-import keras.layers.Layer
+from keras.layers import Layer
 import tensorflow_hub as hub
 
 
