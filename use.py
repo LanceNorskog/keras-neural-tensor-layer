@@ -36,8 +36,6 @@ class USE(Layer):
         print('USE embed size: {}'.format(embed_size))
         assert len(input_shape) == 2
         assert input_shape[-1] == 1
-
-        self.lambda = self.add_weight(shape=(input_dim, self.units), initializer=self.kernel_initializer, name='kernel', regularizer=self.kernel_regularizer, constraint=self.kernel_constraint)
         # ??
         self.input_spec = InputSpec(min_ndim=2, axes={-1: input_dim})
         self.built = True
