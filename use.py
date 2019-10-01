@@ -31,7 +31,7 @@ class USE(Layer):
 
     def build(self, input_shape):
         # Mysterious tf-hub stuff
-        self.embed = hub.Module(module_url)
+        self.embed = hub.Module(self.use_url)
         embed_size = self.embed.get_output_info_dict()['default'].get_shape()[1].value
         print('USE embed size: {}'.format(embed_size))
         assert len(input_shape) == 2
