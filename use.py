@@ -1,4 +1,5 @@
 from keras.layers import Layer, Input
+import tensorflow as tf
 import tensorflow_hub as hub
 
 embed = None
