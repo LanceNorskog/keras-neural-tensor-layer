@@ -1,4 +1,4 @@
-from keras.layers import Layer
+from keras.layers import Layer, Input
 import tensorflow_hub as hub
 
 embed = None
@@ -37,4 +37,6 @@ class USE(Layer):
         }
         return config
 
+    def get_input(self):
+        return Input(shape=(1,), dtype=self.strtype)
 
