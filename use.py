@@ -37,6 +37,6 @@ class USE(Layer):
         }
         return config
 
-def get_input(self):
+def get_input():
     return Input(shape=(1,), dtype="string")
 
