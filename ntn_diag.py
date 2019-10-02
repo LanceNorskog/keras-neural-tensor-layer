@@ -5,7 +5,7 @@ from keras.engine.topology import Layer
 import scipy.stats as stats
 
 class NeuralTensorDiagLayer(Layer):
-  def __init__(self, output_dim, activation=K.tanh, collector=K.mean, **kwargs):
+  def __init__(self, output_dim=None, activation=K.tanh, collector=K.mean, **kwargs):
     self.output_dim = output_dim #k
     self.activation = activation
     self.collector=collector
@@ -58,3 +58,11 @@ class NeuralTensorDiagLayer(Layer):
     # print (input_shape)
     batch_size = input_shape[0][0]
     return (batch_size, self.output_dim)
+
+  def get_config(self):
+        config = {
+            'output_dim': self.output_dim,
+            'activation': self.activation,
+            'collector': self.collector
+        }
+        return config
