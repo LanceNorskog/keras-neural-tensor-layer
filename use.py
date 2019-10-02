@@ -8,7 +8,6 @@ class USE(Layer):
                 use_url="https://tfhub.dev/google/universal-sentence-encoder-large/3",
                  **kwargs):
         self.use_url = use_url
-        self.strtype = "string"
         super(USE, self).__init__(**kwargs)
 
     def build(self, input_shape):
@@ -23,7 +22,7 @@ class USE(Layer):
     def call(self, inputs):
         global embed
         #assert len(inputs.shape) == 1
-        return embed(tf.squeeze(tf.cast(inputs, self.strtype)), signature="default", as_dict=True)["default"]
+        return embed(tf.squeeze(tf.cast(inputs, "string")), signature="default", as_dict=True)["default"]
 
     def compute_output_shape(self, input_shape):
         assert input_shape and len(input_shape) >= 2
@@ -38,6 +37,6 @@ class USE(Layer):
         }
         return config
 
-    def get_input(self):
-        return Input(shape=(1,), dtype=self.strtype)
+def get_input(self):
+    return Input(shape=(1,), dtype="string")
 
