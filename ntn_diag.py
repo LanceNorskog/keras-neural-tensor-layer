@@ -61,8 +61,6 @@ class NeuralTensorDiagLayer(Layer):
 
   def get_config(self):
         config = {
-            'output_dim': self.output_dim,
-            'activation': self.activation,
-            'collector': self.collector
+            'output_dim': self.output_dim
         }
         return config
