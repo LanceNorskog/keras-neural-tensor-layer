@@ -5,10 +5,11 @@ from tensorflow.python.keras.engine.base_layer import Layer
 import scipy.stats as stats
 
 class NeuralTensorDiagLayer(Layer):
-  def __init__(self, output_dim, activation=K.tanh, collector=K.mean, **kwargs):
+  def __init__(self, output_dim, activation=K.tanh, collector=K.mean, feedforward=True, **kwargs):
     self.output_dim = output_dim #k
     self.activation = activation
     self.collector = collector
+    self.feedforward = feedforward
     super(NeuralTensorDiagLayer, self).__init__(**kwargs)
 
   def build(self, input_shape):
@@ -23,17 +24,24 @@ class NeuralTensorDiagLayer(Layer):
     d = input_shape[0][-1].value
 
     print('d: ' + str(d))
+    # maybe feedforward and/or key-value should be Glorot? 
     w_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
+    v_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
+    b_init = tf.initializers.zeros
     self.W = self.add_weight(shape=(k, d), 
                              initializer=w_init,
                              trainable=True,
                              name='W')
-    self.V = self.add_weight(shape=(2*d, k), 
-                             initializer=w_init,
+    if self.feedforward:
+        self.V = self.add_weight(shape=(2*d, k), 
+                             initializer=v_init,
                              trainable=True,
                              name='V')
+    else:
+        self.V = None
     # stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(k,d))
     self.b = K.zeros((k), name='b')
+    self.b = self.add_weight(shape=(k), initializer=b_init, trainable=True, name='b')
     #self.trainable_weights = [self.W, self.V, self.b]
     print("build() finished")
 
@@ -61,7 +69,10 @@ class NeuralTensorDiagLayer(Layer):
     print('o1: ', K.stack(diag_tensor_products))
     #print('o2: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (batch_size, k)))
     #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
-    stacked = K.stack(diag_tensor_products) + feed_forward_product + self.b
+    if self.feedforward:
+        stacked = K.stack(diag_tensor_products) + feed_forward_product + self.b
+    else:
+        stacked = K.stack(diag_tensor_products) + self.b
     result = self.activation(stacked)
     print('result: ', result)
     print("call() finished")
