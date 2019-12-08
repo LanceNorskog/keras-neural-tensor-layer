@@ -5,11 +5,12 @@ from tensorflow.python.keras.engine.base_layer import Layer
 import scipy.stats as stats
 
 class NeuralTensorDiagLayer(Layer):
-  def __init__(self, output_dim, activation=K.tanh, collector=K.mean, feedforward=True, **kwargs):
+  def __init__(self, output_dim, activation=K.tanh, collector=K.mean, feedforward=True, bias-True, **kwargs):
     self.output_dim = output_dim #k
     self.activation = activation
     self.collector = collector
     self.feedforward = feedforward
+    self.bias = bias
     super(NeuralTensorDiagLayer, self).__init__(**kwargs)
 
   def build(self, input_shape):
@@ -32,17 +33,16 @@ class NeuralTensorDiagLayer(Layer):
                              initializer=w_init,
                              trainable=True,
                              name='W')
+    self.V = None
+    self.B = None
     if self.feedforward:
         self.V = self.add_weight(shape=(2*d, k), 
                              initializer=v_init,
                              trainable=True,
                              name='V')
-    else:
-        self.V = None
     # stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(k,d))
-    self.b = K.zeros((k), name='b')
-    self.b = self.add_weight(shape=(k), initializer=b_init, trainable=True, name='b')
-    #self.trainable_weights = [self.W, self.V, self.b]
+    if self.bias:
+        self.b = self.add_weight(shape=(k), initializer=b_init, trainable=True, name='b')
     print("build() finished")
 
 
@@ -57,7 +57,8 @@ class NeuralTensorDiagLayer(Layer):
     print('batch_size: ', batch_size)
     k = self.output_dim
     print('inputs: ', [e1,e2])
-    feed_forward_product = K.dot(K.concatenate([e1,e2]), self.V)
+    if self.feedforward:
+        feed_forward_product = K.dot(K.concatenate([e1,e2]), self.V)
     print('ff: ', feed_forward_product)
     print('d1: ', e1 * self.W[0])
     print('d2: ', e2 * (e1 * self.W[0]))
@@ -69,11 +70,18 @@ class NeuralTensorDiagLayer(Layer):
     print('o1: ', K.stack(diag_tensor_products))
     #print('o2: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (batch_size, k)))
     #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
-    if self.feedforward:
+    if self.feedforward and self.bias::
         stacked = K.stack(diag_tensor_products) + feed_forward_product + self.b
-    else:
+    else if self.feedforward::
+        stacked = K.stack(diag_tensor_products) + feed_forward_product  
+    else if self.bias::
         stacked = K.stack(diag_tensor_products) + self.b
-    result = self.activation(stacked)
+    else::
+        stacked = K.stack(diag_tensor_products)
+    if self.activation:
+        result = self.activation(stacked)
+    else:
+        result = stacked
     print('result: ', result)
     print("call() finished")
     return result
@@ -85,7 +93,12 @@ class NeuralTensorDiagLayer(Layer):
 
     return (batch_size, self.output_dim)
 
+  # not sure if valid when not base types
   def get_config(self):
     config = super(NeuralTensorDiagLayer, self).get_config()
     config.update({'output_dim': self.output_dim})
+    config.update({'activation': self.activation})
+    config.update({'collector': self.collector})
+    config.update({'bias': self.bias})
+    config.update({'feedforward': self.feedforward})
     return config
