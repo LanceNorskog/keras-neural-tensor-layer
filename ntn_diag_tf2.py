@@ -72,9 +72,9 @@ class NeuralTensorDiagLayer(Layer):
     #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
     if self.feedforward and self.bias:
         stacked = K.stack(diag_tensor_products) + feed_forward_product + self.b
-    else if self.feedforward:
+    elif self.feedforward:
         stacked = K.stack(diag_tensor_products) + feed_forward_product  
-    else if self.bias:
+    elif self.bias:
         stacked = K.stack(diag_tensor_products) + self.b
     else:
         stacked = K.stack(diag_tensor_products)
