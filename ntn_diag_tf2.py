@@ -5,7 +5,7 @@ from tensorflow.python.keras.engine.base_layer import Layer
 import scipy.stats as stats
 
 class NeuralTensorDiagLayer(Layer):
-  def __init__(self, output_dim, activation=K.tanh, collector=K.mean, feedforward=True, bias-True, **kwargs):
+  def __init__(self, output_dim, activation=K.tanh, collector=K.mean, feedforward=True, bias=True, **kwargs):
     self.output_dim = output_dim #k
     self.activation = activation
     self.collector = collector
