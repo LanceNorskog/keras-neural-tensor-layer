@@ -15,16 +15,16 @@ class NeuralTensorDiagLayer(Layer):
     super(NeuralTensorDiagLayer, self).__init__(**kwargs)
 
   def build(self, input_shape):
-    assert input_shape[0][-1].value == input_shape[1][-1].value
+    assert input_shape[0][-1] == input_shape[1][-1]
     mean = 0.0
     std = 1.0
     # W : k*d
     k = self.output_dim
-    d = input_shape[0][-1].value
+    d = input_shape[0][-1]
     self.input_dim = d
 
-    w_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
-    v_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
+    #w_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
+    #v_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
     w_init = tf.initializers.glorot_uniform
     v_init = tf.initializers.glorot_uniform
     b_init = tf.initializers.zeros
@@ -76,6 +76,7 @@ class NeuralTensorDiagLayer(Layer):
       raise Exception('NTNDiagLayer must be called on a list of tensors '
                       '(at least 2). Got: ' + str(inputs))
     batch_size = K.shape(inputs[0])[0]
+    input_size = K.shape(inputs[0])[-1]
     k = self.output_dim
     print('batch_size, k: ', batch_size, k)
     e1 = inputs[0]
@@ -84,17 +85,21 @@ class NeuralTensorDiagLayer(Layer):
     if self.feedforward:
         feed_forward_product = K.dot(K.concatenate([e1,e2]), self.V)
     print('ff: ', feed_forward_product)
-    print('d1: ', e1 * self.W[0])
-    print('d2: ', e2 * (e1 * self.W[0]))
     #print('d3: ', e2 * (e1 * self.W[0]) + self.b)
-    e1 = K.squeeze(inputs[0], axis=0)
-    e2 = K.squeeze(inputs[1], axis=0)
+    e1shape = K.eval(K.int_shape(e1))
+    e2shape = K.eval(K.int_shape(e2))
+    print('e1shape: ', e1shape)
+    print('e2shape: ', e2shape)
+    e1 = K.flatten(inputs[0])
+    e2 = K.flatten(inputs[1])
     print('e1: ', e1)
     print('e2: ', e2)
     e1 = K.tile(e1, k)
     e2 = K.tile(e2, k)
-    e1 = K.reshape(e1, shape=self.W.shape)
-    e2 = K.reshape(e1, shape=self.W.shape)
+    print('e1 tiled: ', e1)
+    print('e2 tiled: ', e2)
+    e1 = K.reshape(e1, shape=(-1, k, input_size))
+    e2 = K.reshape(e2, shape=(-1, k, input_size))
     #x = e2 * (e1 * self.W)
     x = e1 * self.W * e2
     print('x:', x)
@@ -145,3 +150,4 @@ class NeuralTensorDiagLayer(Layer):
     config.update({'bias': self.bias})
     config.update({'feedforward': self.feedforward})
     return config
+
