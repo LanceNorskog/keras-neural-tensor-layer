@@ -70,7 +70,7 @@ class NeuralTensorDiagLayer(Layer):
       diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
     stacked = K.stack(diag_tensor_products)
     print('o1: ', stacked)
-    #stacked = K.reshape(stacked, (None, k))
+    stacked = K.reshape(stacked, (None, k))
     #stacked = K.expand_dims(stacked, axis=0)
     print('placeholder: ', tf.placeholder('int32', shape=(None, k)))
     stacked = K.reshape(stacked, tf.placeholder('int32', shape=(None, k)))
