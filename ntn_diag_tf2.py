@@ -20,13 +20,8 @@ class NeuralTensorDiagLayer(Layer):
     std = 1.0
     # W : k*d
     k = self.output_dim
-    print('Input shapes: ' + str(input_shape))
-    print('Input shape: ' + str(input_shape[0]))
-    print('Input shape[-1]: ' + str(input_shape[0]))
     d = input_shape[0][-1].value
 
-    print('d: ' + str(d))
-    # maybe feedforward and/or key-value should be Glorot? 
     w_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
     v_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
     w_init = tf.initializers.glorot_uniform
@@ -43,13 +38,38 @@ class NeuralTensorDiagLayer(Layer):
                              initializer=v_init,
                              trainable=True,
                              name='V')
-    # stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(k,d))
     if self.bias:
         self.b = self.add_weight(shape=(k), initializer=b_init, trainable=True, name='b')
-    print("build() finished")
 
 
   def call(self, inputs, mask=None):
+    if type(inputs) is not list or len(inputs) != 2:
+      raise Exception('NTNDiagLayer must be called on a list of tensors '
+                      '(at least 2). Got: ' + str(inputs))
+    e1 = inputs[0]
+    e2 = inputs[1]
+    batch_size = K.shape(e1)[0]
+    k = self.output_dim
+    if self.feedforward:
+        feed_forward_product = K.dot(K.concatenate([e1,e2]), self.V)
+    diag_tensor_products = [] 
+    for i in range(k):
+      diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
+    stacked = K.stack(diag_tensor_products)
+    if self.feedforward and self.bias:
+        result = stacked + feed_forward_product + self.b
+    elif self.feedforward:
+        result = stacked + feed_forward_product  
+    elif self.bias:
+        result = stacked + self.b
+    else:
+        result = stacked
+    if self.activation:
+        result = self.activation(result)
+        
+    return result
+
+  def call1(self, inputs, mask=None):
     print("call(): ", inputs)
     if type(inputs) is not list or len(inputs) != 2:
       raise Exception('NTNDiagLayer must be called on a list of tensors '
@@ -66,12 +86,13 @@ class NeuralTensorDiagLayer(Layer):
     print('d1: ', e1 * self.W[0])
     print('d2: ', e2 * (e1 * self.W[0]))
     #print('d3: ', e2 * (e1 * self.W[0]) + self.b)
-    indexes = np.arange(k)
+    indexes = K.variable(np.arange(k), dtype=tf.int32)
     #diag_tensor_products = [] 
     #for i in range(k):
     #  diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
     #diag_tensor_products = self.collector(e2 * (e1 * self.W[...]), axis=-1, keepdims=True)
-    x = e2 * (e1 * self.W[...][:])
+    #x = e2 * (e1 * self.W[...][:])
+    x = e2 * (e1 * self.W[indexes])
     print('x:', x)
     y = self.collector(x, axis=-1, keepdims=True)
     print('y:', y)
@@ -108,10 +129,7 @@ class NeuralTensorDiagLayer(Layer):
     return result
 
   def compute_output_shape(self, input_shape):
-    print ("compute_output: ")
     batch_size = input_shape[0][0]
-    print ("compute_output: ", str((batch_size, self.output_dim)))
-
     return (batch_size, self.output_dim)
 
   # not sure if valid when not base types
