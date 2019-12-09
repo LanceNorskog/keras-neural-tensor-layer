@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.python.keras.engine.base_layer import Layer
 import scipy.stats as stats
+import numpy as np
 
 class NeuralTensorDiagLayer(Layer):
   def __init__(self, output_dim, activation=K.tanh, collector=K.mean, feedforward=True, bias=True, **kwargs):
@@ -65,9 +66,13 @@ class NeuralTensorDiagLayer(Layer):
     print('d1: ', e1 * self.W[0])
     print('d2: ', e2 * (e1 * self.W[0]))
     #print('d3: ', e2 * (e1 * self.W[0]) + self.b)
-    diag_tensor_products = [] 
-    for i in range(k):
-      diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
+    indexes = np.arange(k)
+    #diag_tensor_products = [] 
+    #for i in range(k):
+    #  diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
+    diag_tensor_products = self.collector(e2 * (e1 * self.W[...]), axis=-1, keepdims=True)
+    diag_tensor_products = K.squeeze(diag_tensor_products, axis=-1)
+    print('p1: ', diag_tensor_products)
     stacked = K.stack(diag_tensor_products)
     print('o1: ', stacked)
     #stacked = tf.reshape(stacked, (None, k))
