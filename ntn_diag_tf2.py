@@ -74,8 +74,12 @@ class NeuralTensorDiagLayer(Layer):
     if type(inputs) is not list or len(inputs) != 2:
       raise Exception('NTNDiagLayer must be called on a list of tensors '
                       '(at least 2). Got: ' + str(inputs))
+    batch_size = inputs[0].shape[0]
+    input_size = inputs[0].shape[-1]
+    print('batch_size, input_size:', batch_size, input_size)
     batch_size = K.shape(inputs[0])[0]
     input_size = K.shape(inputs[0])[-1]
+    print('batch_size, input_size:', batch_size, input_size)
     k = self.output_dim
     e1 = inputs[0]
     e2 = inputs[1]
