@@ -66,7 +66,7 @@ class NeuralTensorDiagLayer(Layer):
     diag_tensor_products = [] 
     for i in range(k):
       diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
-    stacked = K.shape(diag_tensor_products[0]))
+    stacked = K.stack(diag_tensor_products)
     stacked = K.reshape(stacked, (None, k))
     print('diag.shape: ', K.shape(diag_tensor_products[0]))
     print('o1: ', stacked)
