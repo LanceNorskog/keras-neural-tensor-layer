@@ -18,8 +18,10 @@ class NeuralTensorDiagLayer(Layer):
     # W : k*d
     k = self.output_dim
     d = input_shape[0][-1]
-    initial_W_values = stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(k,d))
-    initial_V_values = stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(2*d,k))
+    #initial_W_values = stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(k,d))
+    #initial_V_values = stats.truncnorm.rvs(-2 * std, 2 * std, loc=mean, scale=std, size=(2*d,k))
+    initial_W_values = np.random.uniform(-1, 1, (k, d))
+    initial_V_values = np.random.uniform(-1, 1, (2 * d, k))
     self.W = K.variable(initial_W_values, name='W')
     self.V = K.variable(initial_V_values, name='V')
     self.b = K.zeros((self.output_dim), name='b')
