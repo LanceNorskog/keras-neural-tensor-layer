@@ -90,9 +90,11 @@ class NeuralTensorDiagLayer(Layer):
     e2 = K.flatten(inputs[1])
     e1 = K.tile(e1, k)
     e2 = K.tile(e2, k)
-    e1 = K.reshape(e1, shape=(-1, input_size, k))
-    e2 = K.reshape(e2, shape=(-1, input_size, k))
-    x = e1 * (e2 * self.W)
+    e1 = K.reshape(e1, shape=(-1, k, input_size))
+    e2 = K.reshape(e2, shape=(-1, k, input_size))
+    x0 = e2 * self.W
+    print('x0:', x)
+    x = e1 * x0
     print('x:', x)
     y = self.collector(x, axis=-1, keepdims=True)
     z = K.squeeze(y, axis=-1)
