@@ -93,7 +93,7 @@ class NeuralTensorDiagLayer(Layer):
     e1 = K.reshape(e1, shape=(-1, k, input_size))
     e2 = K.reshape(e2, shape=(-1, k, input_size))
     x0 = e2 * self.W
-    print('x0:', x)
+    print('x0:', x0)
     x = e1 * x0
     print('x:', x)
     y = self.collector(x, axis=-1, keepdims=True)
