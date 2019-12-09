@@ -71,53 +71,32 @@ class NeuralTensorDiagLayer(Layer):
     return result
 
   def call(self, inputs, mask=None):
-    print("call(): ", inputs)
     if type(inputs) is not list or len(inputs) != 2:
       raise Exception('NTNDiagLayer must be called on a list of tensors '
                       '(at least 2). Got: ' + str(inputs))
     batch_size = K.shape(inputs[0])[0]
     input_size = K.shape(inputs[0])[-1]
     k = self.output_dim
-    print('batch_size, k: ', batch_size, k)
     e1 = inputs[0]
     e2 = inputs[1]
-    print('inputs: ', [e1,e2])
     if self.feedforward:
         feed_forward_product = K.dot(K.concatenate([e1,e2]), self.V)
-    print('ff: ', feed_forward_product)
-    #print('d3: ', e2 * (e1 * self.W[0]) + self.b)
-    e1shape = K.eval(K.int_shape(e1))
-    e2shape = K.eval(K.int_shape(e2))
-    print('e1shape: ', e1shape)
-    print('e2shape: ', e2shape)
+        print('ff: ', feed_forward_product)
     e1 = K.flatten(inputs[0])
     e2 = K.flatten(inputs[1])
-    print('e1: ', e1)
-    print('e2: ', e2)
     e1 = K.tile(e1, k)
     e2 = K.tile(e2, k)
-    print('e1 tiled: ', e1)
-    print('e2 tiled: ', e2)
-    e1 = K.reshape(e1, shape=(-1, k, input_size))
-    e2 = K.reshape(e2, shape=(-1, k, input_size))
-    #x = e2 * (e1 * self.W)
-    x = e1 * self.W * e2
+    e1 = K.reshape(e1, shape=(-1, input_size, k))
+    e2 = K.reshape(e2, shape=(-1, input_size, k))
+    x = e1 * (e2 * self.W)
     print('x:', x)
     y = self.collector(x, axis=-1, keepdims=True)
-    print('y:', y)
     z = K.squeeze(y, axis=-1)
-    print('z:', z)
     diag_tensor_products = z
-    print('p1: ', diag_tensor_products)
-    print('p2: ', diag_tensor_products[0])
     stacked = z # K.stack(diag_tensor_products)
     print('o1: ', stacked)
-    #stacked = tf.reshape(stacked, (None, k))
-    stacked = K.expand_dims(stacked, axis=0)
+    #stacked = K.expand_dims(stacked, axis=0)
     print('o2: ', stacked)
-    #print('placeholder: ', tf.placeholder('int32', shape=(None, k)))
-    #stacked = tf.reshape(stacked, tf.placeholder('int32', shape=(k)))
-    print('o3: ', stacked)
     #print('o2: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (batch_size, k)))
     #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
     #ff:  Tensor("neural_tensor_diag_layer_2/MatMul:0", shape=(?, 2048), dtype=float32)
