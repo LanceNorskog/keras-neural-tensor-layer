@@ -70,10 +70,17 @@ class NeuralTensorDiagLayer(Layer):
     #diag_tensor_products = [] 
     #for i in range(k):
     #  diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
-    diag_tensor_products = self.collector(e2 * (e1 * self.W[...]), axis=-1, keepdims=True)
-    diag_tensor_products = K.squeeze(diag_tensor_products, axis=-1)
+    #diag_tensor_products = self.collector(e2 * (e1 * self.W[...]), axis=-1, keepdims=True)
+    x = e2 * (e1 * self.W[...])
+    print('x:', x)
+    y = self.collector(x, axis=-1, keepdims=True)
+    print('y:', y)
+    z = K.squeeze(y, axis=-1)
+    print('z:', z)
+    diag_tensor_products = z
     print('p1: ', diag_tensor_products)
-    stacked = K.stack(diag_tensor_products)
+    print('p2: ', diag_tensor_products[0])
+    stacked = z # K.stack(diag_tensor_products)
     print('o1: ', stacked)
     #stacked = tf.reshape(stacked, (None, k))
     stacked = K.expand_dims(stacked, axis=0)
