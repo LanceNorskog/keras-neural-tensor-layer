@@ -71,7 +71,7 @@ class NeuralTensorDiagLayer(Layer):
     #for i in range(k):
     #  diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
     #diag_tensor_products = self.collector(e2 * (e1 * self.W[...]), axis=-1, keepdims=True)
-    x = e2 * (e1 * self.W[...])
+    x = e2 * (e1 * self.W[...][:])
     print('x:', x)
     y = self.collector(x, axis=-1, keepdims=True)
     print('y:', y)
