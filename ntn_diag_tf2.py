@@ -28,6 +28,8 @@ class NeuralTensorDiagLayer(Layer):
     # maybe feedforward and/or key-value should be Glorot? 
     w_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
     v_init = tf.initializers.truncated_normal(mean=mean, stddev=2*std)
+    w_init = tf.initializers.glorot_uniform
+    v_init = tf.initializers.glorot_uniform
     b_init = tf.initializers.zeros
     self.W = self.add_weight(shape=(k, d), 
                              initializer=w_init,
@@ -69,7 +71,8 @@ class NeuralTensorDiagLayer(Layer):
     stacked = K.stack(diag_tensor_products)
     print('o1: ', stacked)
     #stacked = K.reshape(stacked, (None, k))
-    stacked = K.expand_dims(stacked, axis=0)
+    #stacked = K.expand_dims(stacked, axis=0)
+    stacked = K.reshape(stacked, tf.placeholder('float32', shape=(None, k)))
     print('o2: ', stacked)
     #print('o2: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (batch_size, k)))
     #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
