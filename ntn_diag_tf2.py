@@ -66,22 +66,25 @@ class NeuralTensorDiagLayer(Layer):
     diag_tensor_products = [] 
     for i in range(k):
       diag_tensor_products.append(self.collector(e2 * (e1 * self.W[i])))
+    stacked = K.shape(diag_tensor_products[0]))
+    stacked = K.reshape(stacked, (None, k))
     print('diag.shape: ', K.shape(diag_tensor_products[0]))
-    print('o1: ', K.stack(diag_tensor_products))
+    print('o1: ', stacked)
     #print('o2: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (batch_size, k)))
     #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
+    #ff:  Tensor("neural_tensor_diag_layer_2/MatMul:0", shape=(?, 2048), dtype=float32)
+    #o1:  Tensor("neural_tensor_diag_layer_2/stack:0", shape=(2048,), dtype=float32)
     if self.feedforward and self.bias:
-        stacked = K.stack(diag_tensor_products) + feed_forward_product + self.b
+        result = stacked + feed_forward_product + self.b
     elif self.feedforward:
-        stacked = K.stack(diag_tensor_products) + feed_forward_product  
+        result = stacked + feed_forward_product  
     elif self.bias:
-        stacked = K.stack(diag_tensor_products) + self.b
-    else:
-        stacked = K.stack(diag_tensor_products)
-    if self.activation:
-        result = self.activation(stacked)
+        result = stacked + self.b
     else:
         result = stacked
+    if self.activation:
+        result = self.activation(result)
+        
     print('result: ', result)
     print("call() finished")
     return result
