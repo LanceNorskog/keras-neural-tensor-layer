@@ -1,4 +1,3 @@
-
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.python.keras.engine.base_layer import Layer
@@ -28,7 +27,7 @@ class NeuralTensorDiagLayer(Layer):
     w_init = tf.initializers.glorot_uniform
     v_init = tf.initializers.glorot_uniform
     b_init = tf.initializers.zeros
-    self.W = self.add_weight(shape=(d, k), 
+    self.W = self.add_weight(shape=(k, d), 
                              initializer=w_init,
                              trainable=True,
                              name='W')
@@ -84,6 +83,7 @@ class NeuralTensorDiagLayer(Layer):
     e2 = K.flatten(inputs[1])
     e1 = K.tile(e1, k)
     e2 = K.tile(e2, k)
+    print('e1:', e1)
     e1 = K.reshape(e1, shape=(-1, k, self.input_dim))
     e2 = K.reshape(e2, shape=(-1, k, self.input_dim))
     x0 = e2 * self.W
@@ -125,4 +125,3 @@ class NeuralTensorDiagLayer(Layer):
     config.update({'bias': self.bias})
     config.update({'feedforward': self.feedforward})
     return config
-
