@@ -84,8 +84,8 @@ class NeuralTensorDiagLayer(Layer):
     e2 = K.flatten(inputs[1])
     e1 = K.tile(e1, k)
     e2 = K.tile(e2, k)
-    e1 = K.reshape(e1, shape=(-1, self.input_dim, k))
-    e2 = K.reshape(e2, shape=(-1, self.input_dim, k))
+    e1 = K.reshape(e1, shape=(-1, k, self.input_dim))
+    e2 = K.reshape(e2, shape=(-1, k, self.input_dim))
     x0 = e2 * self.W
     print('x0:', x0)
     x = e1 * x0
