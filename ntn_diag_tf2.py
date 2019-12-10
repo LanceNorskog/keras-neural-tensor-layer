@@ -28,7 +28,7 @@ class NeuralTensorDiagLayer(Layer):
     w_init = tf.initializers.glorot_uniform
     v_init = tf.initializers.glorot_uniform
     b_init = tf.initializers.zeros
-    self.W = self.add_weight(shape=(k, d), 
+    self.W = self.add_weight(shape=(d, k), 
                              initializer=w_init,
                              trainable=True,
                              name='W')
@@ -74,12 +74,6 @@ class NeuralTensorDiagLayer(Layer):
     if type(inputs) is not list or len(inputs) != 2:
       raise Exception('NTNDiagLayer must be called on a list of tensors '
                       '(at least 2). Got: ' + str(inputs))
-    batch_size = inputs[0].shape[0]
-    input_size = inputs[0].shape[-1]
-    print('batch_size, input_size:', batch_size, input_size)
-    batch_size = K.shape(inputs[0])[0]
-    input_size = K.shape(inputs[0])[-1]
-    print('batch_size, input_size:', batch_size, input_size)
     k = self.output_dim
     e1 = inputs[0]
     e2 = inputs[1]
@@ -90,8 +84,8 @@ class NeuralTensorDiagLayer(Layer):
     e2 = K.flatten(inputs[1])
     e1 = K.tile(e1, k)
     e2 = K.tile(e2, k)
-    e1 = K.reshape(e1, shape=(-1, k, input_size))
-    e2 = K.reshape(e2, shape=(-1, k, input_size))
+    e1 = K.reshape(e1, shape=(-1, self.input_dim, k))
+    e2 = K.reshape(e2, shape=(-1, self.input_dim, k))
     x0 = e2 * self.W
     print('x0:', x0)
     x = e1 * x0
@@ -103,10 +97,6 @@ class NeuralTensorDiagLayer(Layer):
     print('o1: ', stacked)
     #stacked = K.expand_dims(stacked, axis=0)
     print('o2: ', stacked)
-    #print('o2: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (batch_size, k)))
-    #print('o3: ', K.reshape(K.concatenate(diag_tensor_products, axis=1), (-1, k)) + feed_forward_product)
-    #ff:  Tensor("neural_tensor_diag_layer_2/MatMul:0", shape=(?, 2048), dtype=float32)
-    #o1:  Tensor("neural_tensor_diag_layer_2/stack:0", shape=(2048,), dtype=float32)
     if self.feedforward and self.bias:
         result = stacked + feed_forward_product + self.b
     elif self.feedforward:
